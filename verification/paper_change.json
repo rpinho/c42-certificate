@@ -1,0 +1,8 @@
+{
+  "mathematics_changed": false,
+  "change": "Added: Analysis and proof drafting by AI agents under my direction; I reviewed the results at summary level.",
+  "approved_tex_sha256": "12327afc453c27d49855de77cbf08ffdac05a503574178aa04d2b3e43bde9d96",
+  "published_tex_sha256": "00faa0fe9a2eb8b5438f7def7f152e00627b0031f5916c30eb226ab79cf0f5c2",
+  "change_verified_by": "Exact byte comparison after reversing the one disclosure insertion.",
+  "pdf_rebuilt": true
+}

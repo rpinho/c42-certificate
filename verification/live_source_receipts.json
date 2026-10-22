@@ -1,0 +1,106 @@
+[
+  {
+    "name": "tao_head",
+    "url": "https://api.github.com/repos/teorth/optimizationproblems/commits/main",
+    "utc": "2026-10-22T17:25:12.822156+00:00",
+    "status": "OK",
+    "sha256": "aa5736c26f81372f09b18aba71274e14c76bf75f7a4188fef7b4eecd5ec889f0",
+    "bytes": 14249
+  },
+  {
+    "name": "tao_c42",
+    "url": "https://api.github.com/repos/teorth/optimizationproblems/contents/constants/42a.md",
+    "utc": "2026-10-22T17:25:12.822324+00:00",
+    "status": "OK",
+    "sha256": "304ef3b49222fa833d22f6badca365ea0ae12387d1588508f0082a4a53249214",
+    "bytes": 4524
+  },
+  {
+    "name": "tao_open_prs",
+    "url": "https://api.github.com/repos/teorth/optimizationproblems/pulls?state=open&per_page=100",
+    "utc": "2026-10-22T17:25:12.822392+00:00",
+    "status": "OK",
+    "sha256": "1e89416d3e6df4f93b3f55f9c6563cae2c3d649843775e9993d05923a1d11f91",
+    "bytes": 575169
+  },
+  {
+    "name": "tao_c42_issues",
+    "url": "https://api.github.com/search/issues?q=repo:teorth/optimizationproblems+%2242%22&per_page=100&sort=updated",
+    "utc": "2026-10-22T17:25:12.822431+00:00",
+    "status": "OK",
+    "sha256": "9b89bc7a62f54158c90393b7fca8a2275cfcac61610aa965932e5766655fd3c9",
+    "bytes": 43532
+  },
+  {
+    "name": "plata_head",
+    "url": "https://api.github.com/repos/krplatz/turan-c42-six-level-review/commits/main",
+    "utc": "2026-10-22T17:25:12.822489+00:00",
+    "status": "OK",
+    "sha256": "77909e134929333bc2f96ae26e2636e4b73388419cd786445c716688e32c1d9c",
+    "bytes": 5520
+  },
+  {
+    "name": "plata_readme",
+    "url": "https://api.github.com/repos/krplatz/turan-c42-six-level-review/readme",
+    "utc": "2026-10-22T17:25:13.242553+00:00",
+    "status": "OK",
+    "sha256": "060556a06827749828649e08340602c3418713dc76c62fc8350e7949e346e854",
+    "bytes": 4358
+  },
+  {
+    "name": "plata_proof",
+    "url": "https://api.github.com/repos/krplatz/turan-c42-six-level-review/contents/proof.md",
+    "utc": "2026-10-22T17:25:13.293719+00:00",
+    "status": "OK",
+    "sha256": "c5a319ac9b5d5a1be0ab624043369b7ffa19f4e5232f67019d9ae9e43cc4c64d",
+    "bytes": 29192
+  },
+  {
+    "name": "roehrig_head",
+    "url": "https://api.github.com/repos/AndreRoehrig/optimization-constants-certificates/commits/main",
+    "utc": "2026-10-22T17:25:13.321373+00:00",
+    "status": "OK",
+    "sha256": "794e4b0d48de42515d0b27a7550b97640c75b7842251e71e4e4fbf179ecec588",
+    "bytes": 10000
+  },
+  {
+    "name": "roehrig_readme",
+    "url": "https://api.github.com/repos/AndreRoehrig/optimization-constants-certificates/readme",
+    "utc": "2026-10-22T17:25:13.593736+00:00",
+    "status": "OK",
+    "sha256": "fd75f3e779d6019af9af43b0ee68e8c1c92657c0903807fa27d42cee246026b8",
+    "bytes": 5964
+  },
+  {
+    "name": "github_search",
+    "url": "https://api.github.com/search/repositories?q=turan-c42&sort=updated&per_page=100",
+    "utc": "2026-10-22T17:25:13.675989+00:00",
+    "status": "OK",
+    "sha256": "7c01ee6d8765bc957e5954e70b000ee7f69d29c39296b17a9ecfc45da783640f",
+    "bytes": 11910
+  },
+  {
+    "name": "tao_live_page",
+    "url": "https://teorth.github.io/optimizationproblems/constants/42a.html",
+    "utc": "2026-10-22T17:25:13.715540+00:00",
+    "status": "OK",
+    "sha256": "7af1a1bd21578abd9f1b7dd37622f0ec80d0445f692d2e2d356cbeebc417e157",
+    "bytes": 4672
+  },
+  {
+    "name": "arxiv_api",
+    "url": "https://export.arxiv.org/api/query?search_query=all%3A%22pure+power+sum%22+OR+%28all%3ATuran+AND+all%3A%22power+sum%22%29&sortBy=submittedDate&sortOrder=descending&max_results=100",
+    "utc": "2026-10-22T17:25:13.776895+00:00",
+    "status": "OK",
+    "sha256": "81ed67f4be19797bd43bc174fd52df4c6cf09273121504a1a11361386c16131f",
+    "bytes": 8276
+  },
+  {
+    "name": "arxiv_search",
+    "url": "https://arxiv.org/search/?query=Turan+pure+power+sum&searchtype=all&abstracts=show&order=-announced_date_first&size=50",
+    "utc": "2026-10-22T17:25:13.783806+00:00",
+    "status": "OK",
+    "sha256": "877022f2e74da136cb40c632dcdd920a0df7bb26c01f2d18fad1b99ec18c2a8a",
+    "bytes": 18082
+  }
+]

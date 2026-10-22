@@ -1,0 +1,248 @@
+% Local unrefereed draft; no submission, deposit or posting has been made.
+% Copyright 2026 Ricardo Pinho. CC BY 4.0.
+\documentclass[11pt]{amsart}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,booktabs}
+\usepackage[expansion=false]{microtype}
+\usepackage[hyphens]{url}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newcommand{\CC}{\mathbb C}
+\newcommand{\RR}{\mathbb R}
+\title[A step-profile certificate for Turan's constant]{A 256-step certificate for Tur\'an's pure power-sum constant}
+\author{Ricardo Pinho}
+\address{Independent researcher}
+\thanks{ORCID: \href{https://orcid.org/0009-0006-2744-2599}{0009-0006-2744-2599}. Licensed under CC BY 4.0.}
+\date{22 October 2026; local unrefereed draft}
+\keywords{Tur\'an power sums, coefficient cancellation, asymptotic construction, rigorous numerics}
+\begin{document}
+\begin{abstract}
+We give an exact-input certificate for the upper bound
+$C_{42}\le0.6888863712$ in the pure power-sum problem. The construction
+refines the step profiles of Griego, R\"ohrig and Plata to 256 middle
+blocks, without changing their coefficient-cancellation mechanism.
+It improves the strongest public proposal located in our 22 October 2026
+audit, $0.688970$, by $0.0000836288$. An unmodified public interval
+checker and a separately written Arb checker verify the strict finite
+inequalities. The asymptotic implication is proved below; no explicit
+finite threshold, optimality, human peer review or formal verification
+is claimed. All material remains local and unsubmitted.
+\end{abstract}
+\maketitle
+
+\section{Statement and prior constructions}
+Define
+\[
+ R_n=\min_{\substack{z_1,\ldots,z_n\in\CC\\\max_j|z_j|=1}}
+       \max_{1\le k\le n}\left|\sum_{j=1}^n z_j^k\right|,
+ \qquad C_{42}=\limsup_{n\to\infty}R_n.
+\]
+This is constant 42a in Tao and contributors' table~\cite{table}.
+The condition is maximum modulus one; the other roots may lie inside
+the unit disk.
+
+\begin{theorem}\label{thm:main}
+The pure power-sum constant satisfies
+\[
+ C_{42}\le\frac{215276991}{312500000}=0.6888863712.
+\]
+\end{theorem}
+
+The table lists Harcos's $0.69368$ and Griego's proposed
+$0.6906538$~\cite{biro,griego}. Open PR~184 proposes R\"ohrig's
+eight-step bound $0.688983$~\cite{roehrig}. A separate public repository
+by Kerrigan Plata proposes $0.688970$ using six nonuniform middle
+levels~\cite{plata}. We reproduced both latter certificates before
+optimizing. Plata's value is the strongest public upper proposal located,
+and is the comparison used here; both proposals explicitly lack expert
+peer review. The local audit is bounded, not an exhaustive priority claim.
+
+We retain the generating function, free final block and Newton-identity
+argument of these works. The changes are a finer middle profile and
+new rational inputs. No new power-sum reduction theorem is needed.
+
+\section{A finite-step criterion}
+Put $\tau=1/3$ and $B=2/3$. Let
+\[
+ \tau=t_0<t_1<\cdots<t_M=B,\qquad
+ \alpha=a+ib,\quad a>0,\quad s=1-\alpha,
+\]
+and choose middle values $\eta_0,\ldots,\eta_{M-1}$.
+Set $\delta_0=\eta_0-s$ and
+$\delta_j=\eta_j-\eta_{j-1}$ for $j>0$. Define
+\[
+ I_\alpha(x)=\int_0^x\frac{v^{\alpha-1}}{1-v}\,dv,
+ \quad K=I_\alpha(\tau),\quad D=I_a(\tau)>0.
+\]
+For $t+r<1$ put
+\[
+ J_\alpha(t,r)=\int_0^{1-t-r}\frac{v^{\alpha-1}}{1-v}
+       \log\frac{(1-t-v)(1-r-v)}{tr}\,dv,
+\]
+and put $J_\alpha(t,r)=0$ otherwise. Positive real powers use real
+logarithms. This also equals the integral of
+$(1-u-v)^{\alpha-1}/(uv)$ over $u\ge t$, $v\ge r$, $u+v\le1$.
+Finally set
+\begin{equation}\label{eq:Y}
+ Y=1+sK-\sum_j\delta_j\bigl(I_\alpha(1-t_j)-K\bigr)
+       +\frac12\sum_{i,j}\delta_i\delta_jJ_\alpha(t_i,t_j).
+\end{equation}
+
+\begin{proposition}\label{prop:criterion}
+If $|s|<C$, $|\eta_j|<C$ for all $j$, and $|Y|<CD$, then
+$R_n\le C$ for every sufficiently large integer $n$. Consequently
+$C_{42}\le C$.
+\end{proposition}
+
+\begin{proof}
+Put $A=\lfloor n/3\rfloor$. Split the indices into
+$E=\{1,\ldots,A\}$, $M_n=\{A+1,\ldots,n-A-1\}$ and
+$F=\{n-A,\ldots,n\}$. On $E$ set $S_m=s$. On $M_n$ put
+\[
+ w_m=\sum_j\delta_j\mathbf1_{m>\lfloor nt_j\rfloor},
+ \qquad S_m=s+w_m.
+\]
+Every such value is one of the $\eta_j$. Write
+$\beta_l=(\alpha)_l/l!$ and $P_m=n\beta_{n-m}/m$ on $F$.
+These numbers are nonzero because $a>0$. Set
+\begin{align*}
+ Y_n={}&n\beta_n-n\sum_{m\in M_n}\frac{w_m\beta_{n-m}}m
+ +\frac n2\sum_{\substack{u,v\in M_n\\u+v\le n}}
+       \frac{w_uw_v\beta_{n-u-v}}{uv}+s\sum_{m\in F}P_m,\\
+ S_m={}&\frac{Y_n}{\sum_{r\in F}|P_r|}
+              \frac{\overline{P_m}}{|P_m|}\qquad(m\in F).
+\end{align*}
+Consider coefficients $b_l$ defined by
+\[
+ \mathcal B(z)=\frac1{1-z}
+     \exp\left(-\sum_{m=1}^n\frac{S_mz^m}{m}\right)
+       =\sum_{l\ge0}b_lz^l.
+\]
+Relative to $(1-z)^{-\alpha}$ every correction index exceeds $A$.
+Since $3(A+1)>n$, at most two corrections contribute to $b_n$.
+A final correction plus any other correction has index at least $n+1$.
+Expanding the exponential therefore gives exactly
+$nb_n=Y_n-\sum_{m\in F}S_mP_m=0$.
+
+Let $y_2,\ldots,y_n$ be the roots of
+$Z^{n-1}+b_1Z^{n-2}+\cdots+b_{n-1}$, with multiplicity, and let $y_1=1$.
+The logarithmic derivative of $\mathcal B$ and Newton's identities
+give the same triangular recurrence for $S_k$ and
+$Q_k=\sum_j y_j^k$ through $k=n$; at the last step use $b_n=0$.
+Hence $Q_k=S_k$ for $1\le k\le n$. Dividing all roots by
+$\Lambda=\max_j|y_j|\ge1$ cannot increase these power-sum moduli.
+
+It remains to bound the final powers. The gamma-ratio asymptotic is
+\[
+ \beta_l=\frac{l^{\alpha-1}}{\Gamma(\alpha)}(1+O(l^{-1})),
+ \qquad \sum_{l\le L}|\beta_l|=O((L+1)^a).
+\]
+Away from $l=0$, ordinary Riemann sums give
+\[
+ \Gamma(\alpha)n^{-\alpha}Y_n\longrightarrow Y,
+ \qquad |\Gamma(\alpha)|n^{-a}\sum_{m\in F}|P_m|
+          \longrightarrow D.
+\]
+For completeness, discard first $l<\varepsilon n$ in each sum.
+In a single sum $m\asymp n$. In a double sum group by
+$l=n-u-v$: there are at most $n$ pairs and $uv\gg n^2$.
+After the relevant normalization the discarded contribution is
+$O(\varepsilon^a+n^{-a})$ in both cases. This permits
+$\varepsilon\downarrow0$, including the singular endpoint.
+The finite number of step discontinuities and the integer floors do
+not affect the limit. Thus
+$|Y_n|/\sum_F|P_m|\to|Y|/D<C$. All final powers have modulus below
+$C$ eventually, which proves the assertion for all sufficiently large
+$n$, not merely a subsequence.
+\end{proof}
+
+\section{Rational certificate and arithmetic}
+Use $M=256$,
+\begin{align*}
+ t_j&=\frac{256+j}{768}\quad(0\le j\le256),\qquad C=0.6888863712,\\
+ \alpha&=0.64427390171288+0.58993506009068i.
+\end{align*}
+The 256 pairs $\eta_j$ are the terminating-decimal rational strings in
+\texttt{certificates/c42\_256.json}. The complete certificate, including
+these data, has SHA-256
+\begin{center}\small\ttfamily
+705a729155eb508878d17ebea0322627\\
+a0ae02451c044a346a99d2e81c7afcab.
+\end{center}
+The file is the explicit definition of the profile; unverified floating
+search diagnostics retained in it are not inputs to the proof.
+The exact minimum squared profile margin is
+\[
+ \min\{C^2-|s|^2,C^2-|\eta_j|^2\}
+ =\frac{1491623179869746287}{5000000000000000000000000000}>0.
+\]
+Outward enclosures, shortened here, give
+\begin{align*}
+ D&\in[0.892184209107241336566750826518,
+          0.892184209107241336566750826519],\\
+ |Y|/D&\in[0.688886370983465645822767803129,
+             0.688886370983465645822767803130],\\
+ C^2D^2-|Y|^2&\in[2.37472575330897264258,
+                      2.37472575330897264259]\,10^{-10}.
+\end{align*}
+Proposition~\ref{prop:criterion} proves Theorem~\ref{thm:main}.
+
+Two independently authored implementations accept these inputs. The first
+is R\"ohrig's unchanged public \texttt{mpmath.iv} checker at 100 decimal
+places, using explicit geometric series tails for $I$ and $J$.
+The second, written by an independent agent from the mathematical notes
+without reading either search code or the first checker, uses 768-bit
+Arb balls. It computes $I$ through
+\[
+ I_\alpha(x)=\frac{x^\alpha}{\alpha}
+ {}_2F_1(1,\alpha;\alpha+1;x)
+\]
+and $J$ through a separately bounded logarithmic series with 400 terms.
+No optimization status, sampled integral or floating-point maximum is
+accepted as a certificate. Corrupted profiles, malformed thresholds and
+the too-strong radius $0.6888863709$ are rejected.
+
+\section{Reproduction and limits}
+The local package includes pinned public source code, both checkers,
+exact data and transcripts. From its root, with Python, mpmath and
+python-flint available, run
+\begin{verbatim}
+python verify_primary.py certificates/c42_256.json
+python independent/check_bounds.py \
+  certificates/c42_256.json --bits 768 --terms 400
+\end{verbatim}
+The proof gives existence of an eventual threshold, not its numerical
+value. The optimizer's final status was a line-search warning with tiny
+floating constraint residuals; only the subsequent strict interval
+checks justify the result. Neither the profile nor its resolution is
+claimed optimal. The independent review is a separate AI-agent review,
+not independent human expert review or proof-assistant formalization.
+Final source checks and the exact search commands are recorded in the
+local \texttt{PRIOR\_ART.md} and \texttt{REPORT.md}.
+
+\section*{Acknowledgments and assistance}
+The method is due to Griego and its step-profile refinements to R\"ohrig
+and Plata. Analysis and proof drafting by AI agents under my direction;
+I reviewed the results at summary level. Search, code, verification and exposition were developed with
+OpenAI Codex assistance; the second checker was written in a separate
+agent context. No submission, upload or contact occurred.
+
+\begin{thebibliography}{9}
+\bibitem{table} T. Tao and contributors, \emph{Optimization constants in
+mathematics, 42a}, \url{https://teorth.github.io/optimizationproblems/constants/42a.html}.
+\bibitem{biro} A. Bir\'o, \emph{An upper estimate in Tur\'an's pure power
+sum problem}, Indag. Math. (N.S.) \textbf{11} (2000), 499--508.
+\bibitem{griego} S. Griego, \emph{An improved asymptotic certificate for
+Tur\'an's pure power sum constant}, v1.0.0,
+\url{https://github.com/sebastian-griego/turan-c42-certificate/tree/v1.0.0}.
+\bibitem{roehrig} A. R\"ohrig, \emph{Verification certificates for C42 and
+C51}, 9 September 2026, commit ed6387399cf6de02eaa4cf10c43787633496619a,
+\url{https://github.com/AndreRoehrig/optimization-constants-certificates}.
+\bibitem{plata} K. Plata, \emph{Proposed six-level bound for Turan's pure
+power-sum constant}, public review draft,
+\url{https://github.com/krplatz/turan-c42-six-level-review}.
+\end{thebibliography}
+\end{document}

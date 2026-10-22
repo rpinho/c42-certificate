@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "utc": "2026-10-22T17:28:01.269716+00:00",
+  "source": "Clean export of the staged public repository; no imports from the research workspace.",
+  "command": "PYTHON=python sh reproduce.sh",
+  "python": "3.12.13",
+  "mpmath": "1.3.0",
+  "python-flint": "0.9.0",
+  "interval": "PASS: 100 dps, 240 terms",
+  "Arb": "PASS: 768 bits, 400 terms",
+  "corruptions_rejected": 8,
+  "all_original_C42_controls_rejected": 7,
+  "paper_source_archive_build": "PASS; identical extracted paper text"
+}

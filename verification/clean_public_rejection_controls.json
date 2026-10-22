@@ -1,0 +1,61 @@
+{
+  "status": "PASS",
+  "controls": [
+    {
+      "case": "too-small radius",
+      "checker": "interval",
+      "result": "REJECTED",
+      "reason": "profile exceeds C",
+      "seconds": 0.001
+    },
+    {
+      "case": "too-small radius",
+      "checker": "Arb",
+      "result": "REJECTED",
+      "reason": "exact profile radius inequality fails",
+      "seconds": 0.001
+    },
+    {
+      "case": "zero profile: analytic failure despite valid radii",
+      "checker": "interval",
+      "result": "REJECTED",
+      "reason": "limiting inequality fails",
+      "seconds": 189.368
+    },
+    {
+      "case": "zero profile: analytic failure despite valid radii",
+      "checker": "Arb",
+      "result": "REJECTED",
+      "reason": "C42 analytic inequality not certified: [-0.78839718983738098093417140636523547485803278812603763083908239189370928514821252971115146169561017833306887580864942334 +/- 2.98e-120]",
+      "seconds": 12.657
+    },
+    {
+      "case": "repeated threshold",
+      "checker": "interval",
+      "result": "REJECTED",
+      "reason": "",
+      "seconds": 0.001
+    },
+    {
+      "case": "repeated threshold",
+      "checker": "Arb",
+      "result": "REJECTED",
+      "reason": "C42 requires 1/3 <= tau < 1/2 and B=1-tau",
+      "seconds": 0.001
+    },
+    {
+      "case": "near-threshold false bound",
+      "checker": "interval",
+      "result": "REJECTED",
+      "reason": "profile exceeds C",
+      "seconds": 0.001
+    },
+    {
+      "case": "near-threshold false bound",
+      "checker": "Arb",
+      "result": "REJECTED",
+      "reason": "exact profile radius inequality fails",
+      "seconds": 0.001
+    }
+  ]
+}

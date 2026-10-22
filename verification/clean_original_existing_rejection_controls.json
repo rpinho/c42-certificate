@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "scope": "All seven C42 cases in the three original rejection-control scripts, with original inputs and arithmetic parameters. Unrelated cases omitted.",
+  "controls": [
+    {
+      "case": "primary: too-small radius",
+      "status": "REJECTED",
+      "reason": "profile exceeds C"
+    },
+    {
+      "case": "primary: analytic failure despite valid radii",
+      "status": "REJECTED",
+      "reason": "limiting inequality fails"
+    },
+    {
+      "case": "primary: repeated threshold",
+      "status": "REJECTED",
+      "reason": ""
+    },
+    {
+      "case": "Arb: corrupted profile radius",
+      "status": "REJECTED",
+      "reason": "exact profile radius inequality fails"
+    },
+    {
+      "case": "Arb: valid radius but false analytic inequality",
+      "status": "REJECTED",
+      "reason": "C42 analytic inequality not certified: [-0.919443042592348939470208253913518674108437604755669510168985563187493051806500357451876498773972748587018400176458713008181407792472590058572214459509634 +/- 3.45e-154]"
+    },
+    {
+      "case": "Arb: unordered breakpoints",
+      "status": "REJECTED",
+      "reason": "C42 requires 1/3 <= tau < 1/2 and B=1-tau"
+    },
+    {
+      "case": "candidate Arb: near-threshold false bound",
+      "status": "REJECTED",
+      "reason": "exact profile radius inequality fails"
+    }
+  ]
+}
