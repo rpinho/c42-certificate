@@ -2,6 +2,8 @@
 
 Ricardo Pinho · [ORCID 0009-0006-2744-2599](https://orcid.org/0009-0006-2744-2599)
 
+Preprint: [hexagon:2610.00485v1](https://hexagonmath.org/2610.00485?version=1)
+
 This unrefereed note gives an analytic argument and an exact-input certificate for
 **C₄₂ ≤ 215276991/312500000 = 0.6888863712**, where
 
