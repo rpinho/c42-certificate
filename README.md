@@ -1,5 +1,8 @@
 # A 256-step certificate for Turán's pure power-sum constant
 
+[Merged into Tao's optimization-constants table](https://github.com/teorth/optimizationproblems/pull/251)
+on October 26, 2026 (UTC). The result remains unrefereed; table inclusion is not expert peer review or formal verification.
+
 Ricardo Pinho · [ORCID 0009-0006-2744-2599](https://orcid.org/0009-0006-2744-2599)
 
 Preprint: [hexagon:2610.00485v1](https://hexagonmath.org/2610.00485?version=1)
