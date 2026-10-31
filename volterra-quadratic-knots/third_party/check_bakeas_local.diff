@@ -1,0 +1,241 @@
+--- independent_check.py
++++ check_bakeas_local.py
+@@ -1,3 +1,11 @@
++# Adapted from Bakeas/turan-c42-bound/independent_check.py (MIT).
++# Original license: third_party/LICENSE.bakeas-turan-c42-bound. See BAKEAS_ADAPTATION.md.
++# Additional local adaptation: integrated scalar Volterra residual majorant,
++# derived in VOLTERRA_VERIFIER_MATH.md. No import from our verifier/search.
++# This variant additionally uses the local contraction before rational cutoffs.
++# Knot geometry, the untrusted trial solve, threading, receipt output and both
++# propagation bounds change. The refusal under python -O and the finite checks
++# follow version 1.1.0 of the original.
+ """Independent rigorous check of F < T for a C42 profile (python-flint / Arb ball arithmetic).
+ 
+ Written from NOTES.md (Theorem A, Lemma 3, bound (8)) only; it does not reuse rigorous_limit.py.
+@@ -27,6 +35,10 @@
+   |int L/(1-t)| - (h^2/8) int|p~''| / (1 - t_{i+1}),  L = linear interpolant of p~.
+ """
+ import json
++import hashlib
++from pathlib import Path
++from fractions import Fraction
++from scipy.signal import fftconvolve
+ import math
+ import sys
+ import time
+@@ -34,6 +46,9 @@
+ import numpy as np
+ from flint import acb, acb_poly, arb, arb_poly, ctx
+ 
++if not __debug__:   # the checks below are assert statements, which python -O would remove
++    sys.exit("run this program without python -O")
++
+ PREC = 192
+ NPIECES = 24          # knots j/48, j = 0..24, cover [0, 1/2]
+ 
+@@ -65,13 +80,22 @@
+     path = sys.argv[1]
+     M = int(sys.argv[2]) if len(sys.argv) > 2 else 40
+     ctx.prec = PREC
++    ctx.threads = 2
+     t0 = time.time()
+-
+-    prof = json.load(open(path))
++    code_sha=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
++    certificate_raw=Path(path).read_bytes()
++    prof = json.loads(certificate_raw)
+     T = arb(prof["T"])
+     psi = [arb(s) for s in prof["phases"]]
++    NPIECES=len(psi)-1
+     assert len(psi) == NPIECES + 1
+-    beta = [48 * (psi[j + 1] - psi[j]) for j in range(NPIECES)]
++    knots = list(map(Fraction, prof['breaks'])) if isinstance(prof.get('breaks'), list) else [Fraction(j,48) for j in range(25)]
++    assert len(knots)==len(psi) and knots[0]==0 and knots[-1]==Fraction(1,2)
++    claim_q=Fraction(prof.get('C',prof['T']))
++    assert Fraction(prof['T'])<=claim_q<1
++    claim=arb(str(claim_q))
++    assert all(x<y for x,y in zip(knots,knots[1:]))
++    beta = [(psi[j+1]-psi[j])/arb(str(knots[j+1]-knots[j])) for j in range(NPIECES)]
+     I = acb(0, 1)
+     gam = T * (I * psi[0]).exp()
+     a = gam.real
+@@ -80,12 +104,14 @@
+     # On (0,1/2]: |d| = T|1 - e^{i(phi-psi0)}| <= T * max_j |psi_j - psi_0|  (phi piecewise linear).
+     dev = max(abs(p - psi[0]).abs_upper() for p in psi)
+     assert dev < arb(1), "need max|psi_j - psi_0| < 1 so that kappa = T"
+-    assert T < arb(1), "need T < 1 (kappa = T < 1)"
++    assert T>0 and T < arb(1), "need 0<T < 1 (kappa = T < 1)"
+     assert a > arb(0) and a < arb(1), "need 0 < a < 1"
+     kappa = T                       # |d| = T on (1/2, 1], and |d| < T on (0, 1/2]
+ 
+     N = 48 * M
+     H = N // 2
++    assert all((x*N).denominator==1 for x in knots)
++    starts = [int(x*N) for x in knots]
+     h = arb(1) / N
+     t = [arb(i) / N for i in range(N + 1)]
+     bmax = max(abs(b).abs_upper() for b in beta)
+@@ -103,8 +129,8 @@
+     dminus = [None] * (N + 1)   # d(t_i^-)
+     for m in range(N):
+         if m < H:
+-            j = m // M
+-            th = psi[j] + beta[j] * ((m - j * M) * h)
++            j = int(np.searchsorted(starts,m,side="right")-1)
++            th = psi[j] + beta[j] * ((m - starts[j]) * h)
+             E = (I * th).exp()
+             Ec = (I * (th + beta[j] * h / 2)).exp()
+             intd = gam * h - T * E * h * f1[j]
+@@ -120,7 +146,7 @@
+             r1[m] = T * ab * ab * h / 2
+             r2[m] = T * ab * ab * ab * h / 2
+             dplus[m] = gam - T * E
+-            thr = psi[j] + beta[j] * ((m + 1 - j * M) * h)     # phase at t_{m+1}, same piece
++            thr = psi[j] + beta[j] * ((m + 1 - starts[j]) * h)     # phase at t_{m+1}, same piece
+             dminus[m + 1] = gam - T * (I * thr).exp()
+         else:
+             intd = gam * h
+@@ -139,22 +165,28 @@
+     m1f = np.array([to_c(x) for x in m1])
+     dmf = np.array([0j] + [to_c(dminus[i]) for i in range(1, N + 1)])
+     gf, Tf = to_c(gam), float(T.mid())
+-    rm = np.zeros(N + 1, complex)   # rho~(t_i^-), i = 1..N
+-    rp = np.zeros(N + 1, complex)   # rho~(t_i^+), i = 0..N-1
+-    rp[0] = -1j * float(beta[0].mid()) * gf          # = d'(0+) = lim d(t)/t
+-    rmr = np.zeros(N + 1, complex)  # reversed copies for fast dot products
+-    rpr = np.zeros(N + 1, complex)
+-    rpr[N] = rp[0]
+-    for i in range(1, N + 1):
+-        # R(t_i^-) = d(t_i^-) + sum_{k<i} (m0_k rm[i-k] + m1_k rp[i-1-k]) - t_i rm[i] = 0
+-        s = np.dot(m0f[1:i], rmr[N - i + 1:N]) + np.dot(m1f[0:i], rpr[N - i + 1:N + 1])
+-        rm[i] = (dmf[i] + s) / (i / N - m0f[0])
+-        rmr[N - i] = rm[i]
+-        if i < N:
+-            rp[i] = rm[i]
+-            if i == H:      # right limit at 1/2: R(t_H^+) = gamma + S_H - t_H rp[H] = 0
+-                rp[i] = (gf + s + m0f[0] * rm[i]) / (i / N)
+-            rpr[N - i] = rp[i]
++    # ADAPTATION: fast trial generation only. All rigorous bounds below are unchanged.
++    jump = 2*float(T.mid())*np.exp(1j*float(psi[-1].mid()))
++    origin = -1j*float(beta[0].mid())*gf
++    times = np.arange(N+1)/N
++    rhs = dmf.copy(); rhs[1:] += m1f*origin
++    d1f = np.array([to_c(z) for z in D1])
++    rhs[H+1:] += jump*(d1f[1:H+1]-times[H+1:])
++    weights = np.zeros(N+1,complex); weights[1:N] = m0f[1:]+m1f[:-1]
++    diag = times-m0f[0]
++    vv = np.zeros(N+1,complex); vv[0] = origin
++    def solve(lo,hi):
++        if hi-lo<=48:
++            for i in range(lo,hi):
++                if i>lo: rhs[i] += vv[lo:i]@weights[i-lo:0:-1]
++                vv[i] = rhs[i]/diag[i]
++            return
++        mid=(lo+hi)//2;solve(lo,mid)
++        cv=fftconvolve(vv[lo:mid],weights[:hi-lo])
++        rhs[mid:hi]+=cv[mid-lo:hi-lo];solve(mid,hi)
++    solve(1,N+1)
++    rm=vv.copy();rm[H+1:]+=jump
++    rp=vv.copy();rp[H:]+=jump
+     t2 = time.time()
+ 
+     # ---- exact binary values of rho~ and its ramp coefficients -----------------------------
+@@ -203,9 +235,54 @@
+     for i in range(1, N):
+         e = max(Rp[i].abs_upper(), Rm[i + 1].abs_upper())
+         res.append(((e + h * h / 8 * U[i]) / t[i]).upper())
++    assert all(r.is_finite() for r in res), "a cell bound is not finite"
+     imax = max(range(N), key=lambda i: res[i])
+     supR = res[imax]
+     eps = (supR / (1 - kappa)).upper()
++    # Independent implementation of the integrated-residual majorant.
++    # A(x)=int_0^x res(v)*v^(-T)dv bounds the integrated rho error.
++    Awhole=arb(0);Ahalf=arb(0);Rhalf=arb(0);Rnum=arb(0)
++    oldA=arb(0);oldN=arb(1)
++    for cell in range(N):
++        newA=t[cell+1]**(1-T)
++        newN=(1-t[cell+1])**(1-a) if cell+1<N else arb(0)
++        area=res[cell]*(newA-oldA)/(1-T)
++        Awhole+=area
++        Rnum+=res[cell]*(oldN-newN)/(1-a)
++        if cell<H:
++            Ahalf+=area;Rhalf+=h*res[cell]
++        oldA=newA;oldN=newN
++    betaN=T.gamma()*(1-a).gamma()/(T+1-a).gamma()
++    betaD=T.gamma()*(2-a).gamma()/(T+2-a).gamma()
++    new_num_error=(Rnum+T*Awhole*betaN).upper()
++    new_den_error=(2/(1-a)*(arb('0.5')**(1-a)*Rhalf+T*Ahalf*arb('0.5')**(T+1-a)*betaD)).upper()
++    local_errors=[]
++    for cut_q in (Fraction(1,256),Fraction(1,64),Fraction(1,16)):
++        if (cut_q*N).denominator!=1:continue
++        exact_psi=list(map(Fraction,prof['phases']))
++        excursions=[abs(p-exact_psi[0]) for p,u in zip(exact_psi,knots) if u<=cut_q]
++        for j in range(NPIECES):
++            if knots[j]<=cut_q<=knots[j+1]:
++                interpolated=exact_psi[j]+(exact_psi[j+1]-exact_psi[j])*(cut_q-knots[j])/(knots[j+1]-knots[j])
++                excursions.append(abs(interpolated-exact_psi[0]));break
++        k_q=Fraction(prof['T'])*max(excursions)
++        assert 0<=k_q<Fraction(prof['T'])
++        cut=arb(str(cut_q));small=arb(str(k_q));count=int(cut_q*N)
++        local_weighted=arb(0);early_weighted=arb(0);early_plain=arb(0);early_num=arb(0)
++        old_small=arb(0);old_global=arb(0);old_num=arb(1)
++        for j in range(count):
++            u=t[j+1]**(1-small);v=t[j+1]**(1-T);w=(1-t[j+1])**(1-a)
++            local_weighted+=res[j]*(u-old_small)/(1-small)
++            early_weighted+=res[j]*(v-old_global)/(1-T)
++            early_num+=res[j]*(old_num-w)/(1-a);early_plain+=h*res[j]
++            old_small=u;old_global=v;old_num=w
++        Ecut=cut**small*local_weighted
++        effective_whole=cut**(-T)*Ecut+Awhole-early_weighted
++        effective_half=cut**(-T)*Ecut+Ahalf-early_weighted
++        num_cut=((1-cut)**(-a)*Ecut+Rnum-early_num+T*effective_whole*betaN).upper()
++        den_cut=(2/(1-a)*(arb('0.5')**(1-a)*(Ecut+Rhalf-early_plain)+T*effective_half*arb('0.5')**(T+1-a)*betaD)).upper()
++        local_errors.append(dict(delta=str(cut_q),kappa=str(k_q),E_delta=Ecut.str(20),numerator_error=num_cut.str(20),denominator_error=den_cut.str(20)))
++        new_num_error=min(new_num_error,num_cut);new_den_error=min(new_den_error,den_cut)
+     t3 = time.time()
+ 
+     # ---- (4) p~ : numerator and nodal values ------------------------------------------------
+@@ -217,7 +294,7 @@
+     half = arb(1) / 2
+     p1 = 1 + r0t / one_g + sig[0] / (one_g * two_g) + C3[N] \
+         + J * (-gam * half.log()).exp() * half / one_g
+-    num = (abs(p1).abs_upper() + eps / (1 - a)).upper()
++    num = (abs(p1).abs_upper() + min(new_num_error,(eps/(1-a)).upper())).upper()
+ 
+     def ptil(i):     # p~(t_i), 1 <= i <= H
+         return tpow[i] + r0t * t[i] * tpow[i] / one_g + sig[0] * G2[i] + C3[i]
+@@ -247,7 +324,8 @@
+         pcur = pnext
+     den_p = den.lower()
+     Iw = (half ** (2 - a) / (2 - a) + 2 * half ** (3 - a) / (3 - a)) / (1 - a)
+-    den_lo = (den - eps * Iw).lower()
++    den_lo = (den - min(new_den_error,(eps*Iw).upper())).lower()
++    assert num.is_finite() and den_lo.is_finite()
+     assert den_lo > 0
+     Fup = (num / den_lo).upper()
+     t4 = time.time()
+@@ -265,10 +343,22 @@
+     print(f"F <=           : {Fup.str(10, radius=False)}")
+     print(f"time           : setup {t1 - t0:.1f}s, float solve {t2 - t1:.1f}s, "
+           f"residual {t3 - t2:.1f}s, F bound {t4 - t3:.1f}s, total {t4 - t0:.1f}s")
+-    if Fup < T:
+-        print("PASS  (F < T certified)")
++    if len(sys.argv)>3:
++        receipt=dict(verdict='PASS' if Fup<claim else 'UNPROVED',C=str(claim_q),T=prof['T'],N=N,bits=PREC,threads=2,
++                     F_upper=Fup.str(30),F_upper_rational=str(Fup.fmpq()),p_tilde_1=p1.str(40),
++                     residual_upper=supR.str(16),rho_error_upper=eps.str(16),
++                     integrated_residual=dict(A1=Awhole.str(20),Ah=Ahalf.str(20),RN=Rnum.str(20),Rh=Rhalf.str(20),
++                                              numerator_error=new_num_error.str(20),denominator_error=new_den_error.str(20),local_contractions=local_errors),
++                     numerator_upper=num.str(30),denominator_lower=den_lo.str(30),seconds=t4-t0,
++                     certificate_sha256=hashlib.sha256(certificate_raw).hexdigest(),
++                     verifier_sha256=code_sha,
++                     adaptation='Bakeas independent_check: rational knots, fast trial solve, original residual/denominator enclosures, integrated residual plus local contraction')
++        Path(sys.argv[3]).write_text(json.dumps(receipt,indent=2)+'\n')
++    if Fup < claim:
++        print("PASS  (max(T,F) <= C certified)")
+     else:
+         print("FAIL  (bound not below T)")
++        sys.exit(1)
+ 
+ 
+ if __name__ == "__main__":

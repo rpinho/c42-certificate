@@ -1,0 +1,12 @@
+profile        : certificates/C42_compact_best.json
+M = 294912, N = 14155776, prec = 192 bits, i* = 61
+a = Re(gamma)  : [0.1118265910 +/- 2.37e-11]   kappa = T = [0.686361 +/- 2.06e-7]
+sup|R/t|       : 2.8524e-06   (worst cell t = 0.000217)
+eps            : 9.0944e-06
+p~(1)          : 0.14845497655321198596 - 0.19796138000196840317j
+|p(1)| <=      : 0.2474421
+int|p|/(1-t) >=: 0.3605132   (for p~ alone: 0.3605132)
+F~ (approx)    : 0.68636075
+F <=           : 0.6863607773
+time           : setup 161.4s, float solve 97.5s, residual 573.8s, F bound 365.7s, total 1198.4s
+PASS  (max(T,F) <= C certified)

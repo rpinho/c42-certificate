@@ -7,6 +7,8 @@ Ricardo Pinho · [ORCID 0009-0006-2744-2599](https://orcid.org/0009-0006-2744-25
 
 Preprint: [hexagon:2610.00485v1](https://hexagonmath.org/2610.00485?version=1)
 
+A later certificate on Bakeas's Theorem A, 0.6863607950, unrefereed, is in [volterra-quadratic-knots](volterra-quadratic-knots/). The rest of this page is the 256-step result.
+
 This unrefereed note gives an analytic argument and an exact-input certificate for
 **C₄₂ ≤ 215276991/312500000 = 0.6888863712**, where
 
