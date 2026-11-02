@@ -1,5 +1,7 @@
 # A 256-step certificate for Turán's pure power-sum constant
 
+> **Archived.** This repository has moved to [rpinho/math-certificates/c42](https://github.com/rpinho/math-certificates/tree/main/c42). It stays online read-only, so existing links and pinned commits keep working.
+
 [Merged into Tao's optimization-constants table](https://github.com/teorth/optimizationproblems/pull/251)
 on October 26, 2026 (UTC). The result remains unrefereed; table inclusion is not expert peer review or formal verification.
 
